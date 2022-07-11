@@ -1,0 +1,31 @@
+version: '3.1'
+services:
+  mongo:
+    image: mongo:latest
+    restart: always
+    volumes:
+      - mongodb:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: auth_service
+    ports:
+      - 27017:27017
+  api:
+    image: api
+    container_name: auth_service
+    build:
+      context: .
+      # target: debug
+      target: prod
+    environment:
+      MONGO_CONNECTION: mongodb://admin:password@mongo:27017/auth_service?authSource=admin
+      PRIVATE_KEY: bbf7f6c3f81e4da8bd9e810bc5c6773b876ae2e0e7f224995bce794b2af2a7cddfc5995a20f79b8141cd2d1eb650f976037eb2890f7b552e5484783eaafff14b
+      PORT: 80
+      volumes:
+        -.:.
+    ports:
+      - 80:80
+      - 5858:5858 # debug
+volumes:
+  mongodb:
